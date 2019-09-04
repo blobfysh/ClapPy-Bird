@@ -189,6 +189,7 @@ def showWelcomeAnimation(isClapReady = False):
         FPSCLOCK.tick(FPS)
 
 def mainGame(movementInfo):
+    BASESPEED = 2.0 # the speed pipes and base move
     clapReady = True
     score = playerIndex = loopIter = 0
     playerIndexGen = movementInfo['playerIndexGen']
@@ -260,15 +261,19 @@ def mainGame(movementInfo):
         playerMidPos = playerx + IMAGES['player'][0].get_width() / 2
         for pipe in upperPipes:
             pipeMidPos = pipe['x'] + IMAGES['pipe'][0].get_width() / 2
-            if pipeMidPos <= playerMidPos < pipeMidPos + 4:
+            if pipeMidPos <= playerMidPos < pipeMidPos + (BASESPEED * 4):
                 score += 1
                 SOUNDS['point'].play()
+
+                # Increase speed every 5 successful jumps:
+                #if score % 5 == 0:
+                #    BASESPEED += 0.5
 
         # playerIndex basex change
         if (loopIter + 1) % 3 == 0:
             playerIndex = next(playerIndexGen)
         loopIter = (loopIter + 1) % 30
-        basex = -((-basex + 100) % baseShift)
+        basex = -((-basex + (BASESPEED * 100)) % baseShift)
 
         # rotate the player
         if playerRot > -90:
@@ -288,11 +293,11 @@ def mainGame(movementInfo):
 
         # move pipes to left
         for uPipe, lPipe in zip(upperPipes, lowerPipes):
-            uPipe['x'] += pipeVelX
-            lPipe['x'] += pipeVelX
+            uPipe['x'] += BASESPEED * pipeVelX
+            lPipe['x'] += BASESPEED * pipeVelX
 
         # add new pipe when first pipe is about to touch left of screen
-        if 0 < upperPipes[0]['x'] < 5:
+        if upperPipes[0]['x'] < 20 and len(upperPipes) <= 2:
             newPipe = getRandomPipe()
             upperPipes.append(newPipe[0])
             lowerPipes.append(newPipe[1])
