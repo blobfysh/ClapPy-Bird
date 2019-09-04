@@ -3,7 +3,7 @@ import random
 import sys
 
 import pygame
-from pygame.locals import *
+import pygame.locals
 from threading import Thread
 from micListener import get_current_note
 
@@ -13,8 +13,8 @@ t.daemon = True
 t.start()
 
 FPS = 30
-SCREENWIDTH  = 288
-SCREENHEIGHT = 512
+SCREENWIDTH  = 1024
+SCREENHEIGHT = 768
 PIPEGAPSIZE  = 150 # gap between upper and lower part of pipe
 BASEY        = SCREENHEIGHT * 0.79
 # image, sound and hitmask  dicts
@@ -32,8 +32,8 @@ PLAYERS_LIST = (
 
 # list of backgrounds
 BACKGROUNDS_LIST = (
-    'assets/sprites/background-day.png',
-    'assets/sprites/background-night.png',
+    'assets/sprites/background-night2.png',
+    'assets/sprites/background-day2.png',
 )
 
 # list of pipes
@@ -56,7 +56,7 @@ def main():
     pygame.init()
     FPSCLOCK = pygame.time.Clock()
     SCREEN = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT)) #, pygame.FULLSCREEN
-    pygame.display.set_caption('Clappy Bird')
+    pygame.display.set_caption('Clappy Pig')
     #pygame.time.set_timer(clapReadyEvent, 200) # Reset clapReady on game startup
 
     # numbers sprites for score display
@@ -74,11 +74,11 @@ def main():
     )
 
     # game over sprite
-    IMAGES['gameover'] = pygame.image.load('assets/sprites/gameover.png').convert_alpha()
+    IMAGES['gameover'] = pygame.image.load('assets/sprites/gameoverNew.png').convert_alpha()
     # message sprite for welcome screen
-    IMAGES['message'] = pygame.image.load('assets/sprites/message.png').convert_alpha()
+    IMAGES['message'] = pygame.image.load('assets/sprites/messageNew.png').convert_alpha()
     # base (ground) sprite
-    IMAGES['base'] = pygame.image.load('assets/sprites/base.png').convert_alpha()
+    IMAGES['base'] = pygame.image.load('assets/sprites/baseNew.png').convert_alpha()
 
     # sounds
     if 'win' in sys.platform:
@@ -157,7 +157,7 @@ def showWelcomeAnimation(isClapReady = False):
 
     while True:
         for event in pygame.event.get():
-            if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+            if event.type == pygame.locals.QUIT or (event.type == pygame.locals.KEYDOWN and event.key == pygame.locals.K_ESCAPE):
                 pygame.quit()
                 sys.exit()
             if event == clapped and isClapReady:
@@ -218,7 +218,7 @@ def mainGame(movementInfo):
     # player velocity, max velocity, downward accleration, accleration on flap
     playerVelY    =  -9   # player's velocity along Y, default same as playerFlapped
     playerMaxVelY =  10   # max vel along Y, max descend speed
-    playerMinVelY =  -8   # min vel along Y, max ascend speed
+    # playerMinVelY =  -8   # min vel along Y, max ascend speed - UNUSED
     playerAccY    =   1   # players downward accleration
     playerRot     =  45   # player's rotation
     playerVelRot  =   3   # angular speed
@@ -226,10 +226,9 @@ def mainGame(movementInfo):
     playerFlapAcc =  -9   # players speed on flapping
     playerFlapped = False # True when player flaps
 
-
     while True:
         for event in pygame.event.get():
-            if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+            if event.type == pygame.locals.QUIT or (event.type == pygame.locals.KEYDOWN and event.key == pygame.locals.K_ESCAPE):
                 pygame.quit()
                 sys.exit()
             if event == clapped and clapReady == True:
@@ -349,7 +348,7 @@ def showGameOverScreen(crashInfo, isClapReady = False):
 
     while True:
         for event in pygame.event.get():
-            if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+            if event.type == pygame.locals.QUIT or (event.type == pygame.locals.KEYDOWN and event.key == pygame.locals.K_ESCAPE):
                 pygame.quit()
                 sys.exit()
             if event == clapped and clapReady:
@@ -387,7 +386,7 @@ def showGameOverScreen(crashInfo, isClapReady = False):
 
         playerSurface = pygame.transform.rotate(IMAGES['player'][1], playerRot)
         SCREEN.blit(playerSurface, (playerx,playery))
-        SCREEN.blit(IMAGES['gameover'], (50, 180))
+        SCREEN.blit(IMAGES['gameover'], (SCREENWIDTH/2 - (IMAGES['gameover'].get_width()/2), SCREENHEIGHT/2 - (IMAGES['gameover'].get_height()/2)))
 
         FPSCLOCK.tick(FPS)
         pygame.display.update()
@@ -399,7 +398,7 @@ def playerShm(playerShm):
         playerShm['dir'] *= -1
 
     if playerShm['dir'] == 1:
-         playerShm['val'] += 1
+        playerShm['val'] += 1
     else:
         playerShm['val'] -= 1
 

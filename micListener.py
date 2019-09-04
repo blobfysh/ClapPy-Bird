@@ -1,10 +1,8 @@
 import aubio
 import numpy as np
 import pyaudio
-import math
 import pygame
 
-import time
 import argparse
 # Remove music21, queue
 
