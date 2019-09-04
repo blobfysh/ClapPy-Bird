@@ -78,7 +78,7 @@ def main():
     # message sprite for welcome screen
     IMAGES['message'] = pygame.image.load('assets/sprites/messageNew.png').convert_alpha()
     # base (ground) sprite
-    IMAGES['base'] = pygame.image.load('assets/sprites/baseNew.png').convert_alpha()
+    IMAGES['base'] = pygame.image.load('assets/sprites/baseNew-Alternate.png').convert_alpha()
 
     # sounds
     if 'win' in sys.platform:
