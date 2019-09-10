@@ -19,6 +19,7 @@ PIPEGAPSIZE  = 150 # gap between upper and lower part of pipe
 BASEY        = SCREENHEIGHT * 0.79
 # image, sound and hitmask  dicts
 IMAGES, SOUNDS, HITMASKS = {}, {}, {}
+SCREEN, FPSCLOCK = '', ''
 
 # list of all possible players (tuple of 3 positions of flap)
 PLAYERS_LIST = (
@@ -204,14 +205,14 @@ def mainGame(movementInfo):
 
     # list of upper pipes
     upperPipes = [
-        {'x': SCREENWIDTH + 200, 'y': newPipe1[0]['y']},
-        {'x': SCREENWIDTH + 200 + (SCREENWIDTH / 2), 'y': newPipe2[0]['y']},
+        {'x': SCREENWIDTH + 200, 'y': newPipe1[0]['y'], 'moving': False, 'move_direc': 'up'},
+        {'x': SCREENWIDTH + 200 + (SCREENWIDTH / 2), 'y': newPipe2[0]['y'], 'moving': False, 'move_direc': 'down'},
     ]
 
     # list of lowerpipe
     lowerPipes = [
-        {'x': SCREENWIDTH + 200, 'y': newPipe1[1]['y']},
-        {'x': SCREENWIDTH + 200 + (SCREENWIDTH / 2), 'y': newPipe2[1]['y']},
+        {'x': SCREENWIDTH + 200, 'y': newPipe1[1]['y'], 'moving': False, 'move_direc': 'up'},
+        {'x': SCREENWIDTH + 200 + (SCREENWIDTH / 2), 'y': newPipe2[1]['y'], 'moving': False, 'move_direc': 'down'},
     ]
 
     pipeVelX = -4
@@ -266,7 +267,7 @@ def mainGame(movementInfo):
                 SOUNDS['point'].play()
 
                 # Increase speed every 5 successful jumps:
-                #if score % 5 == 0:
+                #if score >= 10 and score % 5 == 0:
                 #    BASESPEED += 0.5
 
         # playerIndex basex change
@@ -298,7 +299,10 @@ def mainGame(movementInfo):
 
         # add new pipe when first pipe is about to touch left of screen
         if upperPipes[0]['x'] < 20 and len(upperPipes) <= 2:
-            newPipe = getRandomPipe()
+            if score >= 5:
+                newPipe = getRandomPipe(True) # passing True makes pipes move up and down
+            else:
+                newPipe = getRandomPipe()
             upperPipes.append(newPipe[0])
             lowerPipes.append(newPipe[1])
 
@@ -313,6 +317,18 @@ def mainGame(movementInfo):
         for uPipe, lPipe in zip(upperPipes, lowerPipes):
             SCREEN.blit(IMAGES['pipe'][0], (uPipe['x'], uPipe['y']))
             SCREEN.blit(IMAGES['pipe'][1], (lPipe['x'], lPipe['y']))
+
+            if(uPipe['moving']):
+                if uPipe['move_direc'] == 'down':
+                    uPipe['y'] += 2
+                    lPipe['y'] += 2
+                    if uPipe['y'] >= -70:
+                        uPipe['move_direc'] = 'up'
+                elif uPipe['move_direc'] == 'up':
+                    uPipe['y'] -= 2
+                    lPipe['y'] -= 2
+                    if uPipe['y'] <= -300:
+                        uPipe['move_direc'] = 'down'
 
         SCREEN.blit(IMAGES['base'], (basex, BASEY))
         # print score so player overlaps the score
@@ -408,7 +424,7 @@ def playerShm(playerShm):
         playerShm['val'] -= 1
 
 
-def getRandomPipe():
+def getRandomPipe(moving = False):
     """returns a randomly generated pipe"""
     # y of gap between upper and lower pipe
     gapY = random.randrange(0, int(BASEY * 0.6 - PIPEGAPSIZE))
@@ -417,8 +433,8 @@ def getRandomPipe():
     pipeX = SCREENWIDTH + 10
 
     return [
-        {'x': pipeX, 'y': gapY - pipeHeight},  # upper pipe
-        {'x': pipeX, 'y': gapY + PIPEGAPSIZE}, # lower pipe
+        {'x': pipeX, 'y': gapY - pipeHeight, 'moving': moving, 'move_direc': 'up'},  # upper pipe
+        {'x': pipeX, 'y': gapY + PIPEGAPSIZE, 'moving': moving, 'move_direc': 'down'}, # lower pipe
     ]
 
 
