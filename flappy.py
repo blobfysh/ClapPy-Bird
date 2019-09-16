@@ -1,6 +1,8 @@
 from itertools import cycle
 import random
 import sys
+import os
+os.environ['SDL_VIDEO_WINDOW_POS'] = "0, 0"
 
 import pygame
 import pygame.locals
@@ -13,9 +15,9 @@ t.daemon = True
 t.start()
 
 FPS = 30
-SCREENWIDTH  = 1024
-SCREENHEIGHT = 768
-PIPEGAPSIZE  = 150 # gap between upper and lower part of pipe
+SCREENWIDTH  = 1600
+SCREENHEIGHT = 900
+PIPEGAPSIZE  = 300 # gap between upper and lower part of pipe
 BASEY        = SCREENHEIGHT * 0.79
 # image, sound and hitmask  dicts
 IMAGES, SOUNDS, HITMASKS = {}, {}, {}
@@ -25,22 +27,22 @@ SCREEN, FPSCLOCK = '', ''
 PLAYERS_LIST = (
     # flying pig
     (
-        'assets/sprites/flypig-upflap.png',
-        'assets/sprites/flypig-midflap.png',
-        'assets/sprites/flypig-downflap.png',
+        'assets/sprites/flypig-upflap-HD.png',
+        'assets/sprites/flypig-midflap-HD.png',
+        'assets/sprites/flypig-downflap-HD.png',
     ),
 )
 
 # list of backgrounds
 BACKGROUNDS_LIST = (
-    'assets/sprites/background-night2.png',
-    'assets/sprites/background-day2.png',
+    'assets/sprites/background-day-HD.png',
+    'assets/sprites/background-night-HD.png',
 )
 
 # list of pipes
 PIPES_LIST = (
-    'assets/sprites/pipe-green.png',
-    'assets/sprites/pipe-red.png',
+    'assets/sprites/pipe-green-HD.png',
+    'assets/sprites/pipe-red-HD.png',
 )
 
 clapped = pygame.event.Event(pygame.USEREVENT, attr1='clapped')
@@ -56,7 +58,7 @@ def main():
     global SCREEN, FPSCLOCK
     pygame.init()
     FPSCLOCK = pygame.time.Clock()
-    SCREEN = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT)) #, pygame.FULLSCREEN
+    SCREEN = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT)) #, pygame.NOFRAME
     pygame.display.set_caption('Clappy Pig')
     #pygame.time.set_timer(clapReadyEvent, 200) # Reset clapReady on game startup
 
@@ -79,7 +81,7 @@ def main():
     # message sprite for welcome screen
     IMAGES['message'] = pygame.image.load('assets/sprites/messageNew.png').convert_alpha()
     # base (ground) sprite
-    IMAGES['base'] = pygame.image.load('assets/sprites/baseNew-Alternate.png').convert_alpha()
+    IMAGES['base'] = pygame.image.load('assets/sprites/baseNew.png').convert_alpha()
 
     # sounds
     if 'win' in sys.platform:
@@ -190,7 +192,7 @@ def showWelcomeAnimation(isClapReady = False):
         FPSCLOCK.tick(FPS)
 
 def mainGame(movementInfo):
-    BASESPEED = 2.0 # the speed pipes and base move
+    BASESPEED = 3.0 # the speed pipes and base move
     clapReady = True
     score = playerIndex = loopIter = 0
     playerIndexGen = movementInfo['playerIndexGen']
@@ -218,14 +220,14 @@ def mainGame(movementInfo):
     pipeVelX = -4
 
     # player velocity, max velocity, downward accleration, accleration on flap
-    playerVelY    =  -9   # player's velocity along Y, default same as playerFlapped
+    playerVelY    =  -13   # player's velocity along Y, default same as playerFlapped
     playerMaxVelY =  10   # max vel along Y, max descend speed
     # playerMinVelY =  -8   # min vel along Y, max ascend speed - UNUSED
     playerAccY    =   1   # players downward accleration
     playerRot     =  45   # player's rotation
     playerVelRot  =   3   # angular speed
     playerRotThr  =  20   # rotation threshold
-    playerFlapAcc =  -9   # players speed on flapping
+    playerFlapAcc =  -13   # players speed on flapping
     playerFlapped = False # True when player flaps
 
     while True:
@@ -267,8 +269,8 @@ def mainGame(movementInfo):
                 SOUNDS['point'].play()
 
                 # Increase speed every 5 successful jumps:
-                #if score >= 10 and score % 5 == 0:
-                #    BASESPEED += 0.5
+                if score >= 10 and score % 5 == 0:
+                    BASESPEED += 0.5
 
         # playerIndex basex change
         if (loopIter + 1) % 3 == 0:
@@ -298,7 +300,7 @@ def mainGame(movementInfo):
             lPipe['x'] += BASESPEED * pipeVelX
 
         # add new pipe when first pipe is about to touch left of screen
-        if upperPipes[0]['x'] < 20 and len(upperPipes) <= 2:
+        if upperPipes[0]['x'] < 100 and len(upperPipes) <= 2:
             if score >= 5:
                 newPipe = getRandomPipe(True) # passing True makes pipes move up and down
             else:
@@ -322,12 +324,12 @@ def mainGame(movementInfo):
                 if uPipe['move_direc'] == 'down':
                     uPipe['y'] += 2
                     lPipe['y'] += 2
-                    if uPipe['y'] >= -70:
+                    if uPipe['y'] >= -300:
                         uPipe['move_direc'] = 'up'
                 elif uPipe['move_direc'] == 'up':
                     uPipe['y'] -= 2
                     lPipe['y'] -= 2
-                    if uPipe['y'] <= -300:
+                    if uPipe['y'] <= -500:
                         uPipe['move_direc'] = 'down'
 
         SCREEN.blit(IMAGES['base'], (basex, BASEY))
@@ -415,7 +417,7 @@ def showGameOverScreen(crashInfo, isClapReady = False):
 
 def playerShm(playerShm):
     """oscillates the value of playerShm['val'] between 8 and -8"""
-    if abs(playerShm['val']) == 8:
+    if abs(playerShm['val']) == 16:
         playerShm['dir'] *= -1
 
     if playerShm['dir'] == 1:
