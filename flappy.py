@@ -10,14 +10,13 @@ from threading import Thread
 from micListener import get_current_note
 from micListener import args
 
-
 t = Thread(target=get_current_note)
 t.daemon = True
 t.start()
 
 FPS = 30
-SCREENWIDTH  = 1024 if args.res == 1024 else args.width if args.width else 1600
-SCREENHEIGHT = 768 if args.res == 1024 else args.height if args.height else 900
+SCREENWIDTH  = args.width if args.width else 1024 if args.res == 1024 else 1575
+SCREENHEIGHT = args.height if args.height else 768 if args.res == 1024 else 875
 PIPEGAPSIZE  = 300 # gap between upper and lower part of pipe
 BASEY        = SCREENHEIGHT * 0.79
 # image, sound and hitmask  dicts
@@ -435,9 +434,12 @@ def getRandomPipe(moving = False):
     pipeHeight = IMAGES['pipe'][0].get_height()
     pipeX = SCREENWIDTH + 10
 
+    direction = ['up', 'down'][random.randrange(0,2)]
+    oppo_direc = 'up' if direction == 'down' else 'down' # ternary conditional to get opposite direction
+    
     return [
-        {'x': pipeX, 'y': gapY - pipeHeight, 'moving': moving, 'move_direc': 'up'},  # upper pipe
-        {'x': pipeX, 'y': gapY + PIPEGAPSIZE, 'moving': moving, 'move_direc': 'down'}, # lower pipe
+        {'x': pipeX, 'y': gapY - pipeHeight, 'moving': moving, 'move_direc': direction},  # upper pipe
+        {'x': pipeX, 'y': gapY + PIPEGAPSIZE, 'moving': moving, 'move_direc': oppo_direc}, # lower pipe
     ]
 
 
