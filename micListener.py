@@ -8,6 +8,9 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-input", required=False, type=int, help="Audio Input Device")
+parser.add_argument("-res", required=False, type=int, help="Set Game Resolution")
+parser.add_argument("-height", required=False, type=int, help="Set Window Height")
+parser.add_argument("-width", required=False, type=int, help="Set Window Width")
 args = parser.parse_args()
 
 if args.input is None:

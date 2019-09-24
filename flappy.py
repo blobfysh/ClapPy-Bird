@@ -8,6 +8,7 @@ import pygame
 import pygame.locals
 from threading import Thread
 from micListener import get_current_note
+from micListener import args
 
 
 t = Thread(target=get_current_note)
@@ -15,8 +16,8 @@ t.daemon = True
 t.start()
 
 FPS = 30
-SCREENWIDTH  = 1600
-SCREENHEIGHT = 900
+SCREENWIDTH  = 1024 if args.res == 1024 else args.width if args.width else 1600
+SCREENHEIGHT = 768 if args.res == 1024 else args.height if args.height else 900
 PIPEGAPSIZE  = 300 # gap between upper and lower part of pipe
 BASEY        = SCREENHEIGHT * 0.79
 # image, sound and hitmask  dicts
