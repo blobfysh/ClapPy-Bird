@@ -22,6 +22,7 @@ BASEY        = SCREENHEIGHT * 0.79
 # image, sound and hitmask  dicts
 IMAGES, SOUNDS, HITMASKS = {}, {}, {}
 SCREEN, FPSCLOCK = '', ''
+HIGHSCORE = 0
 
 # list of all possible players (tuple of 3 positions of flap)
 PLAYERS_LIST = (
@@ -48,6 +49,7 @@ PIPES_LIST = (
 clapped = pygame.event.Event(pygame.USEREVENT, attr1='clapped')
 clapReadyEvent = pygame.USEREVENT + 1
 welcomeReadyEvent = pygame.USEREVENT + 1
+
 
 try:
     xrange
@@ -82,6 +84,8 @@ def main():
     IMAGES['message'] = pygame.image.load('assets/sprites/messageNew.png').convert_alpha()
     # base (ground) sprite
     IMAGES['base'] = pygame.image.load('assets/sprites/baseNew.png').convert_alpha()
+    # highscore text sprite
+    IMAGES['highscore'] = pygame.image.load('assets/sprites/Highscore.png').convert_alpha()
 
     # sounds
     if 'win' in sys.platform:
@@ -149,7 +153,7 @@ def showWelcomeAnimation(isClapReady = False):
     playery = int((SCREENHEIGHT - IMAGES['player'][0].get_height()) / 2)
 
     messagex = int((SCREENWIDTH - IMAGES['message'].get_width()) / 2)
-    messagey = int(SCREENHEIGHT * 0.12)
+    messagey = int(SCREENHEIGHT * 0.2)
 
     basex = 0
     # amount by which base can maximum shift to left
@@ -185,6 +189,7 @@ def showWelcomeAnimation(isClapReady = False):
         SCREEN.blit(IMAGES['background'], (0,0))
         SCREEN.blit(IMAGES['player'][playerIndex],
                     (playerx, playery + playerShmVals['val']))
+        showHighscore(HIGHSCORE)
         SCREEN.blit(IMAGES['message'], (messagex, messagey))
         SCREEN.blit(IMAGES['base'], (basex, BASEY))
 
@@ -347,9 +352,9 @@ def mainGame(movementInfo):
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
-
 def showGameOverScreen(crashInfo, isClapReady = False):
     """crashes the player down ans shows gameover image"""
+    global HIGHSCORE
     clapReady = isClapReady
     score = crashInfo['score']
     playerx = SCREENWIDTH * 0.2
@@ -404,16 +409,16 @@ def showGameOverScreen(crashInfo, isClapReady = False):
         SCREEN.blit(IMAGES['base'], (basex, BASEY))
         showScore(score)
 
-        
-
-
         playerSurface = pygame.transform.rotate(IMAGES['player'][1], playerRot)
         SCREEN.blit(playerSurface, (playerx,playery))
         SCREEN.blit(IMAGES['gameover'], (SCREENWIDTH/2 - (IMAGES['gameover'].get_width()/2), SCREENHEIGHT/2 - (IMAGES['gameover'].get_height()/2)))
-
+        if(score > HIGHSCORE):
+            HIGHSCORE = score
+            showHighscore(HIGHSCORE, True)
+        else:
+            showHighscore(HIGHSCORE, False)
         FPSCLOCK.tick(FPS)
         pygame.display.update()
-
 
 def playerShm(playerShm):
     """oscillates the value of playerShm['val'] between 8 and -8"""
@@ -424,7 +429,6 @@ def playerShm(playerShm):
         playerShm['val'] += 1
     else:
         playerShm['val'] -= 1
-
 
 def getRandomPipe(moving = False):
     """returns a randomly generated pipe"""
@@ -442,7 +446,6 @@ def getRandomPipe(moving = False):
         {'x': pipeX, 'y': gapY + PIPEGAPSIZE, 'moving': moving, 'move_direc': oppo_direc}, # lower pipe
     ]
 
-
 def showScore(score):
     """displays score in center of screen"""
     scoreDigits = [int(x) for x in list(str(score))]
@@ -456,6 +459,24 @@ def showScore(score):
     for digit in scoreDigits:
         SCREEN.blit(IMAGES['numbers'][digit], (Xoffset, SCREENHEIGHT * 0.1))
         Xoffset += IMAGES['numbers'][digit].get_width()
+
+def showHighscore(score, isNew = False):
+    global HIGHSCORE
+    
+    scoreDigits = [int(x) for x in list(str(HIGHSCORE))]
+    totalWidth = 0 # total width of all numbers to be printed
+
+    for digit in scoreDigits:
+        totalWidth += IMAGES['numbers'][digit].get_width()
+
+    Xoffset = (SCREENWIDTH - totalWidth) / 2
+
+    for digit in scoreDigits:
+        SCREEN.blit(IMAGES['numbers'][digit], ((IMAGES['highscore'].get_width()/2) + Xoffset, SCREENHEIGHT * 0.01))
+        Xoffset += IMAGES['numbers'][digit].get_width()
+    
+    SCREEN.blit(IMAGES['highscore'], (int((SCREENWIDTH - IMAGES['highscore'].get_width()) / 2) - totalWidth, SCREENHEIGHT * 0.01))
+    
 
 
 def checkCrash(player, upperPipes, lowerPipes):
