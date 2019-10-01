@@ -79,6 +79,8 @@ def main():
     )
 
     # game over sprite
+    IMAGES['art'] = pygame.image.load('assets/sprites/Proscenium-damask-material.png').convert_alpha()
+    # game over sprite
     IMAGES['gameover'] = pygame.image.load('assets/sprites/gameoverNew.png').convert_alpha()
     # message sprite for welcome screen
     IMAGES['message'] = pygame.image.load('assets/sprites/messageNew.png').convert_alpha()
@@ -139,6 +141,7 @@ def main():
 
 
 def showWelcomeAnimation(isClapReady = False):
+    global backgrounds
     """Shows welcome screen animation of flappy bird"""
     # index of player to blit on screen
     if not isClapReady:
@@ -151,7 +154,7 @@ def showWelcomeAnimation(isClapReady = False):
 
     backgrounds = [
         {'x': 0, 'y': 0},
-        {'x': 1600, 'y': 0}
+        {'x': IMAGES['background'].get_width(), 'y': 0}
     ]
 
     playerx = int(SCREENWIDTH * 0.2)
@@ -164,7 +167,6 @@ def showWelcomeAnimation(isClapReady = False):
     backx = 0
     # amount by which base can maximum shift to left
     baseShift = IMAGES['base'].get_width() - IMAGES['background'].get_width()
-    backShift = IMAGES['background'].get_width()
 
     # player shm for up-down motion on welcome screen
     playerShmVals = {'val': 0, 'dir': 1}
@@ -190,11 +192,9 @@ def showWelcomeAnimation(isClapReady = False):
             playerIndex = next(playerIndexGen)
         loopIter = (loopIter + 1) % 30
         basex = -((-basex + 4) % baseShift)
-        backx = -((-backx + 4) % backShift)
         playerShm(playerShmVals)
 
         # draw sprites
-        # SCREEN.blit(IMAGES['background'], (0,0)) DONT DRAW FOR NOW
         for background in backgrounds:
             background['x'] -= 1
             print(background)
@@ -210,8 +210,6 @@ def showWelcomeAnimation(isClapReady = False):
         if backgrounds[0]['x'] < -IMAGES['background'].get_width():
             backgrounds.pop(0)
             backgrounds.append(getBackground())
-            print('POPPED ONE!')
-            print(backgrounds)
 
         pygame.display.update()
         FPSCLOCK.tick(FPS)
@@ -229,7 +227,6 @@ def mainGame(movementInfo):
     # get 2 new pipes to add to upperPipes lowerPipes list
     newPipe1 = getRandomPipe()
     newPipe2 = getRandomPipe()
-
     # list of upper pipes
     upperPipes = [
         {'x': SCREENWIDTH + 200, 'y': newPipe1[0]['y'], 'moving': False, 'move_direc': 'up'},
@@ -324,6 +321,17 @@ def mainGame(movementInfo):
             uPipe['x'] += BASESPEED * pipeVelX
             lPipe['x'] += BASESPEED * pipeVelX
 
+        # draw background, move it to left each frame
+        for background in backgrounds:
+            background['x'] -= 1
+            print(background)
+            SCREEN.blit(IMAGES['background'], (background['x'], background['y']))
+
+        # remove background if its off the screen
+        if backgrounds[0]['x'] < -IMAGES['background'].get_width():
+            backgrounds.pop(0)
+            backgrounds.append(getBackground())
+
         # add new pipe when first pipe is about to touch left of screen
         if upperPipes[0]['x'] < 100 and len(upperPipes) <= 2:
             if score >= 5:
@@ -339,8 +347,6 @@ def mainGame(movementInfo):
             lowerPipes.pop(0)
 
         # draw sprites
-        SCREEN.blit(IMAGES['background'], (0,0))
-
         for uPipe, lPipe in zip(upperPipes, lowerPipes):
             SCREEN.blit(IMAGES['pipe'][0], (uPipe['x'], uPipe['y']))
             SCREEN.blit(IMAGES['pipe'][1], (lPipe['x'], lPipe['y']))
@@ -420,7 +426,8 @@ def showGameOverScreen(crashInfo, isClapReady = False):
                 playerRot -= playerVelRot
 
         # draw sprites
-        SCREEN.blit(IMAGES['background'], (0,0))
+        for background in backgrounds:
+            SCREEN.blit(IMAGES['background'], (background['x'], background['y']))
 
         for uPipe, lPipe in zip(upperPipes, lowerPipes):
             SCREEN.blit(IMAGES['pipe'][0], (uPipe['x'], uPipe['y']))
