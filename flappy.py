@@ -36,8 +36,8 @@ PLAYERS_LIST = (
 
 # list of backgrounds
 BACKGROUNDS_LIST = (
-    'assets/sprites/background-day-HD.png',
-    'assets/sprites/background-night-HD.png',
+    'assets/sprites/background-day-HD-repeatable.png',
+    'assets/sprites/background-night-HD-repeatable.png',
 )
 
 # list of pipes
@@ -149,6 +149,11 @@ def showWelcomeAnimation(isClapReady = False):
     # iterator used to change playerIndex after every 5th iteration
     loopIter = 0
 
+    backgrounds = [
+        {'x': 0, 'y': 0},
+        {'x': 1600, 'y': 0}
+    ]
+
     playerx = int(SCREENWIDTH * 0.2)
     playery = int((SCREENHEIGHT - IMAGES['player'][0].get_height()) / 2)
 
@@ -156,8 +161,10 @@ def showWelcomeAnimation(isClapReady = False):
     messagey = int(SCREENHEIGHT * 0.2)
 
     basex = 0
+    backx = 0
     # amount by which base can maximum shift to left
     baseShift = IMAGES['base'].get_width() - IMAGES['background'].get_width()
+    backShift = IMAGES['background'].get_width()
 
     # player shm for up-down motion on welcome screen
     playerShmVals = {'val': 0, 'dir': 1}
@@ -183,15 +190,28 @@ def showWelcomeAnimation(isClapReady = False):
             playerIndex = next(playerIndexGen)
         loopIter = (loopIter + 1) % 30
         basex = -((-basex + 4) % baseShift)
+        backx = -((-backx + 4) % backShift)
         playerShm(playerShmVals)
 
         # draw sprites
-        SCREEN.blit(IMAGES['background'], (0,0))
+        # SCREEN.blit(IMAGES['background'], (0,0)) DONT DRAW FOR NOW
+        for background in backgrounds:
+            background['x'] -= 1
+            print(background)
+            SCREEN.blit(IMAGES['background'], (background['x'], background['y']))
+
         SCREEN.blit(IMAGES['player'][playerIndex],
                     (playerx, playery + playerShmVals['val']))
         showHighscore(HIGHSCORE)
         SCREEN.blit(IMAGES['message'], (messagex, messagey))
         SCREEN.blit(IMAGES['base'], (basex, BASEY))
+
+        # remove background if its off the screen
+        if backgrounds[0]['x'] < -IMAGES['background'].get_width():
+            backgrounds.pop(0)
+            backgrounds.append(getBackground())
+            print('POPPED ONE!')
+            print(backgrounds)
 
         pygame.display.update()
         FPSCLOCK.tick(FPS)
@@ -476,8 +496,6 @@ def showHighscore(score, isNew = False):
         Xoffset += IMAGES['numbers'][digit].get_width()
     
     SCREEN.blit(IMAGES['highscore'], (int((SCREENWIDTH - IMAGES['highscore'].get_width()) / 2) - totalWidth, SCREENHEIGHT * 0.01))
-    
-
 
 def checkCrash(player, upperPipes, lowerPipes):
     """returns True if player collders with base or pipes."""
@@ -538,6 +556,9 @@ def getHitmask(image):
         for y in xrange(image.get_height()):
             mask[x].append(bool(image.get_at((x,y))[3]))
     return mask
+
+def getBackground():
+    return {'x': IMAGES['background'].get_width(), 'y': 0}
 
 if __name__ == '__main__':
     main()
