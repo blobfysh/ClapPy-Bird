@@ -84,10 +84,12 @@ def main():
     IMAGES['gameover'] = pygame.image.load('assets/sprites/gameoverNew.png').convert_alpha()
     # message sprite for welcome screen
     IMAGES['message'] = pygame.image.load('assets/sprites/messageNew.png').convert_alpha()
+    IMAGES['badge'] = pygame.image.load('assets/sprites/corner-badge.png').convert_alpha()
     # base (ground) sprite
     IMAGES['base'] = pygame.image.load('assets/sprites/baseNew.png').convert_alpha()
     # highscore text sprite
-    IMAGES['highscore'] = pygame.image.load('assets/sprites/Highscore.png').convert_alpha()
+    IMAGES['highscore'] = pygame.image.load('assets/sprites/highscore4.png').convert_alpha()
+    IMAGES['highscore_new'] = pygame.image.load('assets/sprites/highscoreNew.png').convert_alpha()
 
     # sounds
     if 'win' in sys.platform:
@@ -390,6 +392,7 @@ def showGameOverScreen(crashInfo, isClapReady = False):
     playerAccY = 2
     playerRot = crashInfo['playerRot']
     playerVelRot = 7
+    isNew = False
 
     basex = crashInfo['basex']
 
@@ -439,9 +442,10 @@ def showGameOverScreen(crashInfo, isClapReady = False):
         playerSurface = pygame.transform.rotate(IMAGES['player'][1], playerRot)
         SCREEN.blit(playerSurface, (playerx,playery))
         SCREEN.blit(IMAGES['gameover'], (SCREENWIDTH/2 - (IMAGES['gameover'].get_width()/2), SCREENHEIGHT/2 - (IMAGES['gameover'].get_height()/2)))
-        if(score > HIGHSCORE):
+        if(score > HIGHSCORE or isNew):
             HIGHSCORE = score
             showHighscore(HIGHSCORE, True)
+            isNew = True
         else:
             showHighscore(HIGHSCORE, False)
         FPSCLOCK.tick(FPS)
@@ -496,13 +500,23 @@ def showHighscore(score, isNew = False):
     for digit in scoreDigits:
         totalWidth += IMAGES['numbers'][digit].get_width()
 
-    Xoffset = (SCREENWIDTH - totalWidth) / 2
+    Xoffset = (SCREENWIDTH*0.02) + IMAGES['highscore'].get_width()
+
+    # highscore background corner
+    SCREEN.blit(IMAGES['badge'], (-130 + totalWidth, SCREENHEIGHT * -0.03 if not isNew else 0))
 
     for digit in scoreDigits:
-        SCREEN.blit(IMAGES['numbers'][digit], ((IMAGES['highscore'].get_width()/2) + Xoffset, SCREENHEIGHT * 0.01))
-        Xoffset += IMAGES['numbers'][digit].get_width()
+        if(isNew):
+            SCREEN.blit(IMAGES['numbers'][digit], (Xoffset, SCREENHEIGHT * 0.04))
+            Xoffset += IMAGES['numbers'][digit].get_width()
+        else:
+            SCREEN.blit(IMAGES['numbers'][digit], (Xoffset, SCREENHEIGHT * 0.01))
+            Xoffset += IMAGES['numbers'][digit].get_width()
     
-    SCREEN.blit(IMAGES['highscore'], (int((SCREENWIDTH - IMAGES['highscore'].get_width()) / 2) - totalWidth, SCREENHEIGHT * 0.01))
+    if(isNew):
+        SCREEN.blit(IMAGES['highscore_new'], (SCREENWIDTH * 0.01, SCREENHEIGHT * 0.01))
+    else:
+        SCREEN.blit(IMAGES['highscore'], (SCREENWIDTH * 0.01, SCREENHEIGHT * 0.01))
 
 def checkCrash(player, upperPipes, lowerPipes):
     """returns True if player collders with base or pipes."""
