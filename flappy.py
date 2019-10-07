@@ -32,6 +32,11 @@ PLAYERS_LIST = (
         'assets/sprites/flypig-midflap-HD.png',
         'assets/sprites/flypig-downflap-HD.png',
     ),
+    (
+        'assets/sprites/flyingPig_upflap.png',
+        'assets/sprites/flyingPig_midflap.png',
+        'assets/sprites/flyingPig_downflap.png',
+    ),
 )
 
 # list of backgrounds
@@ -42,8 +47,9 @@ BACKGROUNDS_LIST = (
 
 # list of pipes
 PIPES_LIST = (
-    'assets/sprites/pipe-green-HD.png',
-    'assets/sprites/pipe-red-HD.png',
+    'assets/sprites/florenceYall-HD.png',
+    'assets/sprites/pipe-green-rosemary-HD.png',
+    'assets/sprites/pipe-red-JamesBrown-HD.png',
 )
 
 clapped = pygame.event.Event(pygame.USEREVENT, attr1='clapped')
