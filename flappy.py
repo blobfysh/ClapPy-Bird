@@ -356,7 +356,7 @@ def mainGame(movementInfo):
 
         # draw sprites
         for uPipe, lPipe in zip(upperPipes, lowerPipes):
-            SCREEN.blit(IMAGES['pipe'][0], (uPipe['x'], uPipe['y']))
+            SCREEN.blit(pygame.transform.flip(IMAGES['pipe'][0], True, False), (uPipe['x'], uPipe['y']))
             SCREEN.blit(IMAGES['pipe'][1], (lPipe['x'], lPipe['y']))
 
             if(uPipe['moving']):
@@ -439,7 +439,7 @@ def showGameOverScreen(crashInfo, isClapReady = False):
             SCREEN.blit(IMAGES['background'], (background['x'], background['y']))
 
         for uPipe, lPipe in zip(upperPipes, lowerPipes):
-            SCREEN.blit(IMAGES['pipe'][0], (uPipe['x'], uPipe['y']))
+            SCREEN.blit(pygame.transform.flip(IMAGES['pipe'][0], True, False), (uPipe['x'], uPipe['y']))
             SCREEN.blit(IMAGES['pipe'][1], (lPipe['x'], lPipe['y']))
 
         SCREEN.blit(IMAGES['base'], (basex, BASEY))
