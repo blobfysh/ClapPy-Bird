@@ -205,7 +205,6 @@ def showWelcomeAnimation(isClapReady = False):
         # draw sprites
         for background in backgrounds:
             background['x'] -= 1
-            print(background)
             SCREEN.blit(IMAGES['background'], (background['x'], background['y']))
 
         SCREEN.blit(IMAGES['player'][playerIndex],
@@ -332,7 +331,6 @@ def mainGame(movementInfo):
         # draw background, move it to left each frame
         for background in backgrounds:
             background['x'] -= 1
-            print(background)
             SCREEN.blit(IMAGES['background'], (background['x'], background['y']))
 
         # remove background if its off the screen
@@ -399,6 +397,7 @@ def showGameOverScreen(crashInfo, isClapReady = False):
     playerRot = crashInfo['playerRot']
     playerVelRot = 7
     isNew = False
+    start_ticks=pygame.time.get_ticks()
 
     basex = crashInfo['basex']
 
@@ -410,6 +409,9 @@ def showGameOverScreen(crashInfo, isClapReady = False):
         SOUNDS['die'].play()
 
     while True:
+        seconds = (pygame.time.get_ticks() - start_ticks)/1000 # calculate how many seconds
+        if(seconds > 5):
+            return
         for event in pygame.event.get():
             if event.type == pygame.locals.QUIT or (event.type == pygame.locals.KEYDOWN and event.key == pygame.locals.K_ESCAPE):
                 pygame.quit()
